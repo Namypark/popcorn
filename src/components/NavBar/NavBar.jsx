@@ -1,7 +1,5 @@
-import { useState } from "react";
-
-function Search() {
-  const [query, setQuery] = useState("");
+import PropTypes from "prop-types";
+function Search({ query, setQuery }) {
   return (
     <input
       className="search"
@@ -12,6 +10,10 @@ function Search() {
     />
   );
 }
+Search.propTypes = {
+  query: PropTypes.string.isRequired,
+  setQuery: PropTypes.func.isRequired,
+};
 
 function Logo() {
   return (
@@ -22,23 +24,31 @@ function Logo() {
   );
 }
 
-function NumResults({ watched, movies }) {
+function NumResults({ movies }) {
   return (
     <p className="num-results">
       Found <strong>{movies.length}</strong> results
     </p>
   );
 }
+NumResults.propTypes = {
+  movies: PropTypes.arrayOf.isRequired,
+};
 //export all components
 export { Logo, Search, NumResults };
 
-export default function NavBar({ children }) {
+export default function NavBar({ children, query, setQuery }) {
   return (
     <nav className="nav-bar">
       <Logo />
-      <Search />
-
+      <Search query={query} setQuery={setQuery} />
       {children}
     </nav>
   );
 }
+
+NavBar.propTypes = {
+  children: PropTypes.node.isRequired,
+  query: PropTypes.string.isRequired,
+  setQuery: PropTypes.func.isRequired,
+};

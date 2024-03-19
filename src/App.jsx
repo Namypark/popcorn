@@ -1,27 +1,113 @@
-import { useState } from "react";
-import NavBar, { Logo, Search, NumResults } from "./components/NavBar/NavBar";
+/* eslint-disable no-unused-vars */
+import { useEffect, useState } from "react";
+import NavBar, { NumResults } from "./components/NavBar/NavBar";
+import LoadingScreen from "./components/LoadingScreen/LoadingScreen.jsx";
+import ErrorMessage from "./components/ErrorMessage/ErrorMessage.jsx";
 import Main, {
-  ListBox,
-  SummaryBox,
+  Box,
   MovieList,
+  WatchedSummary,
+  SummaryList,
+  MovieDetail,
 } from "./components/Main/Main.jsx";
 import { tempMovieData, tempWatchedData } from "../data.js";
+import "./components/LoadingScreen/loader.css";
+import { KEY } from "./key.js";
 
 export default function App() {
-  const [watched, setWatched] = useState(tempWatchedData);
-  const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState([]);
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [query, setQuery] = useState("avengers");
+  const [selectedId, setSelectedId] = useState(null); // for the movie details component
+  const [rating, setRating] = useState(0); // for the star rating component
+
+  function handleMovieClick(id) {
+    setSelectedId(() => (selectedId === id ? null : id));
+  }
+  const onCloseMovie = () => {
+    setSelectedId(null);
+    setRating(0);
+  };
+  //both buttons are used for the Movie Detail component
+
+  function handleWatched(movie) {
+    const isExisting = watched.some(
+      (watchedMovie) => watchedMovie.Title === movie.Title
+    );
+    if (isExisting) {
+      setRating(0);
+
+      return;
+    } // checks if there is already an existing movie of the same title in the List
+    setWatched((prev) => [...prev, movie]);
+    setRating(0);
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (query.length < 3) {
+          setMovies([]);
+          setError("");
+          return;
+        } //If query is empty skip the API REQUEST
+        setIsLoading(true);
+        const response = await fetch(
+          `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+        );
+        if (!response.ok) throw new Error("Something went wrong");
+        const data = await response.json();
+        if (data.Response === "False") throw new Error(data.Error);
+        setMovies(data.Search);
+        setIsLoading(false);
+        setError("");
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData(); //call the async function here
+
+    return () => {
+      //clean up but we leave it empty
+    };
+  }, [query]);
 
   return (
     <div className="app">
-      <NavBar>
+      <NavBar query={query} setQuery={setQuery}>
         <NumResults watched={watched} movies={movies} />
       </NavBar>
 
-      <Main>
-        <ListBox>
-          <MovieList movies={movies} watched={watched} />
-        </ListBox>
-        <SummaryBox watched={watched} />
+      <Main rating={rating} setRating={setRating}>
+        <Box>
+          {isLoading && <LoadingScreen />}
+          {!isLoading && !error && (
+            <MovieList movies={movies} onSelectMovie={handleMovieClick} />
+          )}
+          {error && <ErrorMessage message={error} />}
+        </Box>
+        <Box>
+          {selectedId ? (
+            <MovieDetail
+              selectedId={selectedId}
+              onCloseMovie={onCloseMovie}
+              onAddWatched={handleWatched}
+              rating={rating}
+              setRating={setRating}
+              watched={watched}
+            />
+          ) : (
+            <>
+              <WatchedSummary watched={watched} />
+              <SummaryList watched={watched} setWatched={setWatched} />
+            </>
+          )}
+        </Box>
       </Main>
     </div>
   );
