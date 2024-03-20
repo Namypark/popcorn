@@ -20,7 +20,7 @@ function MovieList({ movies, onSelectMovie }) {
 }
 
 MovieList.propTypes = {
-  movies: PropTypes.func.isRequired,
+  movies: PropTypes.array,
   onSelectMovie: PropTypes.func.isRequired,
 };
 
@@ -118,7 +118,7 @@ function SummaryList({ watched, setWatched }) {
   );
 }
 SummaryList.propTypes = {
-  watched: PropTypes.func,
+  watched: PropTypes.array,
   setWatched: PropTypes.func,
 };
 function Summary({ movie, onDeleteWatched }) {
@@ -150,7 +150,7 @@ function Summary({ movie, onDeleteWatched }) {
   );
 }
 Summary.propTypes = {
-  movie: PropTypes.array.isRequired,
+  movie: PropTypes.object.isRequired,
   onDeleteWatched: PropTypes.func.isRequired,
 };
 
@@ -209,6 +209,29 @@ function MovieDetail({
     getMoviesDetail();
   }, [selectedId]);
   // Adding the selectedId as the dependency array allows the useEffect hook to be re-rendered anytime the the value in the selectedId is changed
+
+  //Altering the  Title of the webpage Dynamically
+  useEffect(() => {
+    document.title = title;
+    //altering th icon as well
+    const link =
+      document.querySelector("link[rel*='icon'") ||
+      document.createElement("link");
+
+    link.type = "image/x-icon ";
+    link.rel = "shortcut icon";
+    link.href = poster;
+
+    document.head.appendChild(link);
+
+    //cleanup function to remove the old favicon link element
+
+    return () => {
+      if (link.parentNode) {
+        link.parentNode.removeChild(link);
+      }
+    };
+  }, [title, poster]);
 
   let MovieDetail = {
     imdbID,
@@ -293,7 +316,7 @@ MovieDetail.propTypes = {
   setRating: PropTypes.func.isRequired,
   onCloseMovie: PropTypes.func.isRequired,
   onAddWatched: PropTypes.func.isRequired,
-  watched: PropTypes.func.isRequired,
+  watched: PropTypes.array.isRequired,
 };
 //export all
 
