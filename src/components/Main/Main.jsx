@@ -70,7 +70,6 @@ function WatchedSummary({ watched }) {
       return movie.runtime.split(" ").at(0);
     })
   );
-  console.log(`avg Runtime: ${avgRuntime}`);
   return (
     <div className="summary">
       <h2>Movies you watched</h2>
@@ -200,7 +199,6 @@ function MovieDetail({
         setSelectedMovie(data);
         setIsLoading(false);
       } catch (error) {
-        console.error(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -227,11 +225,12 @@ function MovieDetail({
     //cleanup function to remove the old favicon link element
 
     return () => {
+      document.title = "Popcorn";
       if (link.parentNode) {
         link.parentNode.removeChild(link);
       }
     };
-  }, [title, poster]);
+  }, [title]);
 
   let MovieDetail = {
     imdbID,
@@ -247,7 +246,6 @@ function MovieDetail({
     Genre: genre,
     userRating: rating,
   };
-  console.log(`MovieDetail: ${MovieDetail}`);
   return (
     <div className="details">
       {isLoading ? (

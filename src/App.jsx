@@ -19,7 +19,7 @@ export default function App() {
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("avengers");
+  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null); // for the movie details component
   const [rating, setRating] = useState(0); // for the star rating component
 
@@ -46,6 +46,21 @@ export default function App() {
   }
 
   useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.code === "Escape") {
+        onCloseMovie();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+
+    //clean up function
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
     const fetchData = async () => {
       try {
         if (query.length < 3) {
@@ -55,7 +70,8 @@ export default function App() {
         } //If query is empty skip the API REQUEST
         setIsLoading(true);
         const response = await fetch(
-          `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+          `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+          { signal: controller.signal }
         );
         if (!response.ok) throw new Error("Something went wrong");
         const data = await response.json();
@@ -64,7 +80,9 @@ export default function App() {
         setIsLoading(false);
         setError("");
       } catch (error) {
-        setError(error.message);
+        if (error.name !== "AbortError") {
+          setError(error.message);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -74,6 +92,7 @@ export default function App() {
 
     return () => {
       //clean up but we leave it empty
+      controller.abort();
     };
   }, [query]);
 
