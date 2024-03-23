@@ -15,13 +15,17 @@ import "./components/LoadingScreen/loader.css";
 import { KEY } from "./key.js";
 
 export default function App() {
-  const [watched, setWatched] = useState([]);
   const [movies, setMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null); // for the movie details component
   const [rating, setRating] = useState(0); // for the star rating component
+  //const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(() => {
+    const getStorage = localStorage.getItem("watched");
+    return JSON.parse(getStorage);
+  });
 
   function handleMovieClick(id) {
     setSelectedId(() => (selectedId === id ? null : id));
@@ -41,10 +45,13 @@ export default function App() {
 
       return;
     } // checks if there is already an existing movie of the same title in the List
+
     setWatched((prev) => [...prev, movie]);
     setRating(0);
   }
-
+  useEffect(() => {
+    localStorage.setItem("watched", JSON.stringify(watched)); // saves item to the browser localStorage
+  }, [watched]);
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.code === "Escape") {
