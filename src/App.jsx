@@ -14,18 +14,21 @@ import { tempMovieData, tempWatchedData } from "../data.js";
 import "./components/LoadingScreen/loader.css";
 import { KEY } from "./key.js";
 import useMovies from "./useMovies.jsx";
+import useLocalStorage from "./useLocalStorage.jsx";
 
 export default function App() {
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null); // for the movie details component
   const [rating, setRating] = useState(0); // for the star rating component
+  const [watched, setWatched] = useLocalStorage([], "watched");
   const { movies, isLoading, error, setMovies, setIsLoading, setError } =
     useMovies(query);
+
   //const [watched, setWatched] = useState([]);
-  const [watched, setWatched] = useState(() => {
-    const getStorage = localStorage.getItem("watched");
-    return JSON.parse(getStorage);
-  });
+  // const [watched, setWatched] = useState(() => {
+  //   const getStorage = localStorage.getItem("watched");
+  //   return JSON.parse(getStorage);
+  // });
 
   function handleMovieClick(id) {
     setSelectedId(() => (selectedId === id ? null : id));
@@ -87,9 +90,11 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  useEffect(() => {
-    localStorage.setItem("watched", JSON.stringify(watched)); // saves item to the browser localStorage
-  }, [watched]);
+  // useEffect(() => {
+  //   localStorage.setItem("watched", JSON.stringify(watched)); // saves item to the browser localStorage
+  // }, [watched]);
+  //
+
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.code === "Escape") {
