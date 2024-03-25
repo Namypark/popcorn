@@ -13,14 +13,14 @@ import Main, {
 import { tempMovieData, tempWatchedData } from "../data.js";
 import "./components/LoadingScreen/loader.css";
 import { KEY } from "./key.js";
+import useMovies from "./useMovies.jsx";
 
 export default function App() {
-  const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null); // for the movie details component
   const [rating, setRating] = useState(0); // for the star rating component
+  const { movies, isLoading, error, setMovies, setIsLoading, setError } =
+    useMovies(query);
   //const [watched, setWatched] = useState([]);
   const [watched, setWatched] = useState(() => {
     const getStorage = localStorage.getItem("watched");
@@ -30,10 +30,10 @@ export default function App() {
   function handleMovieClick(id) {
     setSelectedId(() => (selectedId === id ? null : id));
   }
-  const onCloseMovie = () => {
+  function onCloseMovie() {
     setSelectedId(null);
     setRating(0);
-  };
+  }
   //both buttons are used for the Movie Detail component
 
   function handleWatched(movie) {
@@ -49,23 +49,6 @@ export default function App() {
     setWatched((prev) => [...prev, movie]);
     setRating(0);
   }
-  useEffect(() => {
-    localStorage.setItem("watched", JSON.stringify(watched)); // saves item to the browser localStorage
-  }, [watched]);
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.code === "Escape") {
-        onCloseMovie();
-      }
-    };
-    document.addEventListener("keydown", handleEscape);
-
-    //clean up function
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
-
   useEffect(() => {
     const controller = new AbortController();
     const fetchData = async () => {
@@ -101,7 +84,25 @@ export default function App() {
       //clean up but we leave it empty
       controller.abort();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
+
+  useEffect(() => {
+    localStorage.setItem("watched", JSON.stringify(watched)); // saves item to the browser localStorage
+  }, [watched]);
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.code === "Escape") {
+        onCloseMovie();
+      }
+    };
+    document.addEventListener("keydown", handleEscape);
+
+    //clean up function
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
   return (
     <div className="app">

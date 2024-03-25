@@ -1,5 +1,22 @@
 import PropTypes from "prop-types";
+import { useEffect, useRef } from "react";
 function Search({ query, setQuery }) {
+  const inputEl = useRef(null);
+  useEffect(() => {
+    function handleEnter(e) {
+      if (document.activeElement === inputEl.current) return;
+      if (e.code === "Enter") {
+        console.log("Enter");
+        inputEl.current.focus();
+      }
+    }
+    document.addEventListener("keydown", handleEnter);
+
+    return () => {
+      document.removeEventListener("keydown", handleEnter);
+    };
+  }, []);
+
   return (
     <input
       className="search"
@@ -7,6 +24,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   );
 }
@@ -32,7 +50,7 @@ function NumResults({ movies }) {
   );
 }
 NumResults.propTypes = {
-  movies: PropTypes.arrayOf.isRequired,
+  movies: PropTypes.func.isRequired,
 };
 //export all components
 export { Logo, Search, NumResults };

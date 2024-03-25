@@ -199,6 +199,7 @@ function MovieDetail({
         setSelectedMovie(data);
         setIsLoading(false);
       } catch (error) {
+        console.error(error);
       } finally {
         setIsLoading(false);
       }
@@ -230,7 +231,7 @@ function MovieDetail({
         link.parentNode.removeChild(link);
       }
     };
-  }, [title]);
+  }, [title, poster]);
 
   let MovieDetail = {
     imdbID,
