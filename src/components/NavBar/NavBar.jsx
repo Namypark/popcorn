@@ -1,21 +1,15 @@
 import PropTypes from "prop-types";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import useKey from "../../useKey";
 function Search({ query, setQuery }) {
   const inputEl = useRef(null);
-  useEffect(() => {
-    function handleEnter(e) {
-      if (document.activeElement === inputEl.current) return;
-      if (e.code === "Enter") {
-        console.log("Enter");
-        inputEl.current.focus();
-      }
-    }
-    document.addEventListener("keydown", handleEnter);
 
-    return () => {
-      document.removeEventListener("keydown", handleEnter);
-    };
-  }, []);
+  useKey("Enter", function () {
+    if (document.activeElement === inputEl.current) return;
+    inputEl.current.focus();
+
+    setQuery("");
+  });
 
   return (
     <input
@@ -50,7 +44,7 @@ function NumResults({ movies }) {
   );
 }
 NumResults.propTypes = {
-  movies: PropTypes.func.isRequired,
+  movies: PropTypes.array.isRequired,
 };
 //export all components
 export { Logo, Search, NumResults };

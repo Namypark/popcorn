@@ -15,6 +15,7 @@ import "./components/LoadingScreen/loader.css";
 import { KEY } from "./key.js";
 import useMovies from "./useMovies.jsx";
 import useLocalStorage from "./useLocalStorage.jsx";
+import useKey from "./useKey.jsx";
 
 export default function App() {
   const [query, setQuery] = useState("");
@@ -94,20 +95,7 @@ export default function App() {
   //   localStorage.setItem("watched", JSON.stringify(watched)); // saves item to the browser localStorage
   // }, [watched]);
   //
-
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.code === "Escape") {
-        onCloseMovie();
-      }
-    };
-    document.addEventListener("keydown", handleEscape);
-
-    //clean up function
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, []);
+  useKey("Escape", onCloseMovie);
 
   return (
     <div className="app">

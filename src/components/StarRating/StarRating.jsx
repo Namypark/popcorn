@@ -112,10 +112,10 @@ export default function StarRating({
 
 StarRating.propTypes = {
   maxHeight: PropTypes.number.isRequired,
-  color: PropTypes.string.isRequired,
+  color: PropTypes.string,
   size: PropTypes.number.isRequired,
-  className: PropTypes.string.isRequired,
-  messages: PropTypes.array.isRequired,
+  className: PropTypes.string,
+  messages: PropTypes.array,
   rating: PropTypes.number.isRequired,
-  setRating: PropTypes.func.isRequired,
+  setRating: PropTypes.func,
 };
